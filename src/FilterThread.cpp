@@ -11,12 +11,15 @@
  * @param pInput        Pipe which stores the input for the filter.
  * @param bSelfManaged  True if the FilterThread is allowed to manage the filter by itself, false if another class manages the FilterThread (i.e. calls FilterThread::run()).
  */
-FilterThread::FilterThread( Pipe* pOutput, Filter* pFilter, Pipe* pInput, bool bSelfManaged )
-	: m_pOutput( pOutput )
-	, m_bFilterThreadActive( true )
-	, m_bSelfManaged( bSelfManaged )
-	, m_pFilter( pFilter )
-	, m_pInput( pInput )
+FilterThread::FilterThread(Pipe* pOutput,
+                           Filter* pFilter,
+                           Pipe* pInput,
+                           bool bSelfManaged)
+    : m_pOutput(pOutput)
+    , m_bFilterThreadActive(true)
+    , m_bSelfManaged(bSelfManaged)
+    , m_pFilter(pFilter)
+    , m_pInput(pInput)
 {
 }
 
@@ -25,7 +28,7 @@ FilterThread::FilterThread( Pipe* pOutput, Filter* pFilter, Pipe* pInput, bool b
  */
 FilterThread::~FilterThread()
 {
-	if( m_bFilterThreadActive )
+    if (m_bFilterThreadActive)
         FilterThread::stop();
 }
 
@@ -35,19 +38,17 @@ FilterThread::~FilterThread()
  */
 void FilterThread::run()
 {
-	m_bFilterThreadActive = true;
-	do
-	{
-		std::shared_ptr<PipeData> pTemp = m_pInput->blockingPop();
-		if( pTemp )
-			pTemp = m_pFilter->process( pTemp );
+    m_bFilterThreadActive = true;
+    do {
+        std::shared_ptr<PipeData> pTemp = m_pInput->blockingPop();
+        if (pTemp)
+            pTemp = m_pFilter->process(pTemp);
 
-		if( pTemp )
-			m_pOutput->push( pTemp );
-		else
-			m_pInput->reset();
-	}
-	while( m_bFilterThreadActive && m_bSelfManaged );
+        if (pTemp)
+            m_pOutput->push(pTemp);
+        else
+            m_pInput->reset();
+    } while (m_bFilterThreadActive && m_bSelfManaged);
 }
 
 /**
@@ -57,7 +58,7 @@ void FilterThread::run()
  */
 bool FilterThread::isFiltering()
 {
-	return m_bFilterThreadActive;
+    return m_bFilterThreadActive;
 }
 
 /**
@@ -65,15 +66,14 @@ bool FilterThread::isFiltering()
  */
 void FilterThread::stop()
 {
-	m_bFilterThreadActive = false;
-	m_pInput->disable();
-	m_pInput->reset();
+    m_bFilterThreadActive = false;
+    m_pInput->disable();
+    m_pInput->reset();
 
-	join();
+    join();
 
-	m_pInput->enable();
+    m_pInput->enable();
 }
-
 
 /// MULTIFILTER
 
@@ -84,10 +84,14 @@ void FilterThread::stop()
  * @param pFilter       The filter that is called for processing in this thread.
  * @param inputPipes    Arbitrary number of input pipes storing the input for the filter.
  */
-MultiFilterThread::MultiFilterThread( Pipe* pOutput, MultiFilter* pMultiFilter, std::vector<Pipe*>::iterator begin, std::vector<Pipe*>::iterator end, bool bSelfManaged )
-	: FilterThread ( pOutput, nullptr, nullptr, bSelfManaged )
-	, m_pFilter( pMultiFilter )
-	, m_inputPipes( begin, end )
+MultiFilterThread::MultiFilterThread(Pipe* pOutput,
+                                     MultiFilter* pMultiFilter,
+                                     std::vector<Pipe*>::iterator begin,
+                                     std::vector<Pipe*>::iterator end,
+                                     bool bSelfManaged)
+    : FilterThread(pOutput, nullptr, nullptr, bSelfManaged)
+    , m_pFilter(pMultiFilter)
+    , m_inputPipes(begin, end)
 {
 }
 
@@ -96,7 +100,7 @@ MultiFilterThread::MultiFilterThread( Pipe* pOutput, MultiFilter* pMultiFilter, 
  */
 MultiFilterThread::~MultiFilterThread()
 {
-	if( m_bFilterThreadActive )
+    if (m_bFilterThreadActive)
         MultiFilterThread::stop();
 }
 
@@ -105,26 +109,24 @@ MultiFilterThread::~MultiFilterThread()
  */
 void MultiFilterThread::run()
 {
-	m_bFilterThreadActive = true;
-	do
-	{
-		// prepare vector for the data of all incoming pipes
-		std::vector< std::shared_ptr<PipeData> > incoming;
-		incoming.resize( m_inputPipes.size() );
+    m_bFilterThreadActive = true;
+    do {
+        // prepare vector for the data of all incoming pipes
+        std::vector<std::shared_ptr<PipeData>> incoming;
+        incoming.resize(m_inputPipes.size());
 
-		// get the data from the pipes
-		for( unsigned int i=0; i<m_inputPipes.size(); ++i )
-			incoming[i] = m_inputPipes[i]->blockingPop();
+        // get the data from the pipes
+        for (unsigned int i = 0; i < m_inputPipes.size(); ++i)
+            incoming[i] = m_inputPipes[i]->blockingPop();
 
-		if( !m_bFilterThreadActive )
-			return;
+        if (!m_bFilterThreadActive)
+            return;
 
-		// process the data
-		std::shared_ptr<PipeData> pTemp = m_pFilter->processImpl( incoming );
-		if( pTemp )
-			m_pOutput->push( pTemp );
-	}
-	while( m_bFilterThreadActive && m_bSelfManaged );
+        // process the data
+        std::shared_ptr<PipeData> pTemp = m_pFilter->processImpl(incoming);
+        if (pTemp)
+            m_pOutput->push(pTemp);
+    } while (m_bFilterThreadActive && m_bSelfManaged);
 }
 
 /**
@@ -132,13 +134,13 @@ void MultiFilterThread::run()
  */
 void MultiFilterThread::stop()
 {
-	m_bFilterThreadActive = false;
-	for( auto inputPipe : m_inputPipes )
-		inputPipe->disable();
-	for( auto inputPipe : m_inputPipes )
-		inputPipe->reset();
+    m_bFilterThreadActive = false;
+    for (auto inputPipe : m_inputPipes)
+        inputPipe->disable();
+    for (auto inputPipe : m_inputPipes)
+        inputPipe->reset();
 
-	join();
-	for( auto inputPipe : m_inputPipes )
-		inputPipe->enable();
+    join();
+    for (auto inputPipe : m_inputPipes)
+        inputPipe->enable();
 }

@@ -17,14 +17,22 @@
  *
  * @brief	A cross-plattform implementation of a simple thread.
  */
-class PIPELINE_EXPORT Thread {
+class PIPELINE_EXPORT Thread
+{
 public:
-  /**
-   * @enum	EPriority
-   *
-   * @brief	Values that represent the thread priority.
-   */
-  enum EPriority { TP_Lowest = -2, TP_Low, TP_Normal, TP_High, TP_Highest };
+    /**
+     * @enum	EPriority
+     *
+     * @brief	Values that represent the thread priority.
+     */
+    enum EPriority
+    {
+        TP_Lowest = -2,
+        TP_Low,
+        TP_Normal,
+        TP_High,
+        TP_Highest
+    };
 
     Thread();
     virtual ~Thread();
@@ -50,29 +58,29 @@ protected:
     virtual void run() = 0;
 
 #ifndef WIN32
-  static void *entryPoint(void *pthis);
+    static void* entryPoint(void* pthis);
 #else
-  static DWORD WINAPI entryPoint(LPVOID runnableInstance);
+    static DWORD WINAPI entryPoint(LPVOID runnableInstance);
 #endif
 
 private:
-  volatile bool m_bActive;
+    volatile bool m_bActive;
 
-  ///< The thread priority
-  EPriority m_iThreadPriority;
+    ///< The thread priority
+    EPriority m_iThreadPriority;
 
 #ifndef WIN32
-  ///< Identifier for the thread
-  pthread_t m_iThreadID;
+    ///< Identifier for the thread
+    pthread_t m_iThreadID;
 #else
-  ///< Identifier for the thread
-  DWORD m_iThreadID;
-  ///< Handle of the thread
-  HANDLE m_hThread;
+    ///< Identifier for the thread
+    DWORD m_iThreadID;
+    ///< Handle of the thread
+    HANDLE m_hThread;
 #endif
 
-  ///< Number of threads
-  static int sm_iThreadCount;
+    ///< Number of threads
+    static int sm_iThreadCount;
 };
 
 #endif // THREAD_H_INCLUDED

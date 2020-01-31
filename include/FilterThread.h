@@ -32,14 +32,14 @@ public:
     virtual void stop();
 
 protected:
-  Pipe *m_pOutput;
+    Pipe* m_pOutput;
 
-  volatile bool m_bFilterThreadActive;
-  bool m_bSelfManaged;
+    volatile bool m_bFilterThreadActive;
+    bool m_bSelfManaged;
 
 private:
-  Filter *m_pFilter;
-  Pipe *m_pInput;
+    Filter* m_pFilter;
+    Pipe* m_pInput;
 };
 
 /**

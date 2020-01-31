@@ -26,13 +26,13 @@ public:
     virtual unsigned int size();
 
 private:
-  std::shared_ptr<PipeData> m_spElem;
-  std::mutex m_mutex;
+    std::shared_ptr<PipeData> m_spElem;
+    std::mutex m_mutex;
 
-  bool m_bBuffered;
-  bool m_waitForSlowestFilter;
+    bool m_bBuffered;
+    bool m_waitForSlowestFilter;
 
-  bool m_bEnabled;
+    bool m_bEnabled;
 };
 
 class PIPELINE_EXPORT NullPipe : public Pipe
