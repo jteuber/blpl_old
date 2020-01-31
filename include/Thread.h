@@ -4,9 +4,9 @@
 #include "Pipeline_global.h"
 
 #ifndef WIN32
+#include <cstring>
 #include <pthread.h>
 #include <unistd.h>
-#include <string.h>
 #else
 #define NOMINMAX
 #include <windows.h>
@@ -26,28 +26,28 @@ public:
    */
   enum EPriority { TP_Lowest = -2, TP_Low, TP_Normal, TP_High, TP_Highest };
 
-  Thread();
-  virtual ~Thread();
+    Thread();
+    virtual ~Thread();
 
-  bool start();
-  void join();
+    bool start();
+    void join();
 
-  // setter
-  void setPriority(EPriority iPriority);
+    // setter
+    void setPriority(EPriority iPriority);
 
-  // getter
-  EPriority getPriority() const;
-  bool isAlive() const;
+    // getter
+    [[nodiscard]] EPriority getPriority() const;
+    [[nodiscard]] bool isAlive() const;
 
-  // for calling from inside the thread
-  static void sleep(unsigned int iMilliseconds = 0);
+    // for calling from inside the thread
+    static void sleep(unsigned int iMilliseconds = 0);
 
 protected:
-  /**
-   * @brief This method is called in the thread after it is started with
-   * start().
-   */
-  virtual void run() = 0;
+    /**
+     * @brief This method is called in the thread after it is started with
+     * start().
+     */
+    virtual void run() = 0;
 
 #ifndef WIN32
   static void *entryPoint(void *pthis);

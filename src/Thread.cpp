@@ -119,7 +119,7 @@ void* Thread::entryPoint(void* pthis)
 DWORD WINAPI Thread::entryPoint(LPVOID pthis)
 #endif
 {
-    Thread* pThread    = static_cast<Thread*>(pthis);
+    auto* pThread      = static_cast<Thread*>(pthis);
     pThread->m_bActive = true;
     pThread->run();
     pThread->m_bActive = false;
@@ -139,7 +139,8 @@ void Thread::setPriority(EPriority iPriority)
     m_iThreadPriority = iPriority;
 
 #ifndef WIN32
-    struct sched_param sp;
+    struct sched_param sp
+    {};
     memset(&sp, 0, sizeof(struct sched_param));
 
     int iMin = sched_get_priority_min(0);

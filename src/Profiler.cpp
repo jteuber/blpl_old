@@ -1,6 +1,6 @@
 #include "Profiler.h"
 
-Profiler::Profiler(std::string className)
+Profiler::Profiler(const std::string& className)
 #ifdef PROFILE
     : m_log(Log::getLog(className))
 {

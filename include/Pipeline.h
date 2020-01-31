@@ -29,9 +29,9 @@ private:
   std::vector<Pipe *> m_pipes;
   std::vector<FilterThread *> m_filterThreads;
 
-  unsigned int m_lastPipeID;
+  unsigned long m_lastPipeID;
   bool m_waitForSlowestFilter;
   bool m_bUseThreading;
   int m_msecsBetweenFrames;
-  unsigned int m_nrOfSources;
+  unsigned long m_nrOfSources;
 };

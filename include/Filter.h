@@ -17,6 +17,10 @@
 class PIPELINE_EXPORT Filter
 {
 public:
+    Filter()
+        : m_prof(typeid(*this).name())
+    {}
+
     virtual std::shared_ptr<PipeData> process(std::shared_ptr<PipeData> pIn)
     {
         m_prof.startCycle();
@@ -46,7 +50,7 @@ public:
     virtual void reset() = 0;
 
 private:
-    Profiler m_prof = Profiler(typeid(*this).name());
+    Profiler m_prof;
 };
 
 /**
@@ -56,6 +60,10 @@ private:
 class PIPELINE_EXPORT MultiFilter
 {
 public:
+    MultiFilter()
+        : m_prof(typeid(*this).name())
+    {}
+
     virtual std::shared_ptr<PipeData>
     process(std::vector<std::shared_ptr<PipeData>> pIn)
     {
@@ -86,5 +94,5 @@ public:
     virtual void reset() = 0;
 
 private:
-    Profiler m_prof = Profiler(typeid(*this).name());
+    Profiler m_prof;
 };

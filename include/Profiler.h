@@ -14,7 +14,7 @@
 class Profiler
 {
 public:
-    explicit Profiler(std::string className);
+    explicit Profiler(const std::string& className);
 
     void startCycle();
     void endCycle();

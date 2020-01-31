@@ -20,14 +20,16 @@
  */
 class PIPELINE_EXPORT FilterThread : public Thread {
 public:
-  explicit FilterThread(Pipe *pOutput, Filter *pFilter, Pipe *pInput,
-                        bool bSelfManaged = true);
-  virtual ~FilterThread();
+    explicit FilterThread(Pipe* pOutput,
+                          Filter* pFilter,
+                          Pipe* pInput,
+                          bool bSelfManaged = true);
+    ~FilterThread() override;
 
-  virtual void run() override;
-  virtual bool isFiltering();
+    void run() override;
+    virtual bool isFiltering();
 
-  virtual void stop();
+    virtual void stop();
 
 protected:
   Pipe *m_pOutput;
@@ -50,18 +52,20 @@ private:
  * individual stages don't have to be threadsafe (which is oftentimes not even
  * possible).
  */
-class PIPELINE_EXPORT MultiFilterThread : public FilterThread {
+class PIPELINE_EXPORT MultiFilterThread : public FilterThread
+{
 public:
-  explicit MultiFilterThread(Pipe *pOutput, MultiFilter *pMultiFilter,
-                             std::vector<Pipe *>::iterator start,
-                             std::vector<Pipe *>::iterator end,
-                             bool bSelfManaged = true);
-  virtual ~MultiFilterThread();
+    explicit MultiFilterThread(Pipe* pOutput,
+                               MultiFilter* pMultiFilter,
+                               std::vector<Pipe*>::iterator start,
+                               std::vector<Pipe*>::iterator end,
+                               bool bSelfManaged = true);
+    ~MultiFilterThread() override;
 
-  virtual void run() override;
-  virtual void stop() override;
+    void run() override;
+    void stop() override;
 
 private:
-  MultiFilter *m_pFilter;
-  std::vector<Pipe *> m_inputPipes;
+    MultiFilter* m_pFilter;
+    std::vector<Pipe*> m_inputPipes;
 };

@@ -9,20 +9,21 @@
 #include "PipeData.h"
 #include "Thread.h"
 
-class PIPELINE_EXPORT Pipe {
+class PIPELINE_EXPORT Pipe
+{
 public:
-  Pipe(bool waitForSlowestFilter = false, bool bBuffered = false);
-  virtual ~Pipe();
+    explicit Pipe(bool waitForSlowestFilter = false, bool bBuffered = false);
+    virtual ~Pipe() = default;
 
-  virtual std::shared_ptr<PipeData> pop();
-  virtual std::shared_ptr<PipeData> blockingPop();
-  virtual void push(const std::shared_ptr<PipeData> &pData);
-  virtual void reset();
+    virtual std::shared_ptr<PipeData> pop();
+    virtual std::shared_ptr<PipeData> blockingPop();
+    virtual void push(const std::shared_ptr<PipeData>& pData);
+    virtual void reset();
 
-  virtual void disable();
-  virtual void enable();
+    virtual void disable();
+    virtual void enable();
 
-  virtual unsigned int size();
+    virtual unsigned int size();
 
 private:
   std::shared_ptr<PipeData> m_spElem;
@@ -34,24 +35,27 @@ private:
   bool m_bEnabled;
 };
 
-class PIPELINE_EXPORT NullPipe : public Pipe {
+class PIPELINE_EXPORT NullPipe : public Pipe
+{
 public:
-  NullPipe(int msecsBetweenPops = 0);
-  virtual ~NullPipe() {}
+    explicit NullPipe(int msecsBetweenPops = 0);
 
-  virtual std::shared_ptr<PipeData> pop();
-  virtual std::shared_ptr<PipeData> blockingPop();
-  virtual void push(const std::shared_ptr<PipeData> & /*pData*/) {}
-  virtual void reset() {}
+    std::shared_ptr<PipeData> pop() override;
+    std::shared_ptr<PipeData> blockingPop() override;
+    void push(const std::shared_ptr<PipeData>& /*pData*/) override {}
+    void reset() override {}
 
-  virtual void disable() {}
-  virtual void enable() {}
+    void disable() override {}
+    void enable() override {}
 
-  virtual unsigned int size() { return 1; }
+    unsigned int size() override
+    {
+        return 1;
+    }
 
 private:
-  bool m_wait;
-  int m_msecsBetweenPops;
+    bool m_wait;
+    int m_msecsBetweenPops;
 
-  std::chrono::high_resolution_clock::time_point m_lastPop;
+    std::chrono::high_resolution_clock::time_point m_lastPop;
 };

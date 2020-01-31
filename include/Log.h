@@ -3,8 +3,8 @@
 
 #include "Pipeline_global.h"
 
+#include <cstdio> // for FILE
 #include <map>
-#include <stdio.h> // for FILE
 #include <string>
 
 /**
@@ -22,14 +22,15 @@ public:
    * @brief	Values that represent the importance of the logged message (aka
    * the error level ;) ).
    */
-  enum EErrorLevel {
-    EL_INFO = 0, ///< Information
-    EL_WARNING,  ///< Problems or errors that were catched and do not have any
-                 ///< impact on the execution of the program
-    EL_ERROR, ///< Errors which could not be dealt with and likely altered the
-              ///< programs behaviour
-    EL_FATAL_ERROR ///< Errors that crashes the programm
-  };
+    enum EErrorLevel
+    {
+        EL_INFO = 0, ///< Information
+        EL_WARNING, ///< Problems or errors that were caught and do not have any
+                    ///< impact on the execution of the program
+        EL_ERROR,   ///< Errors which could not be dealt with and likely altered
+                  ///< the programs behaviour
+        EL_FATAL_ERROR ///< Errors that crash the program
+    };
 
   static Log *getLogPtr(const std::string &strLogName);
   static Log &getLog(const std::string &strLogName);
@@ -44,26 +45,26 @@ public:
                   EErrorLevel elErrorLevel = EL_INFO);
 
   bool logInfo(const std::string &strMessage);
-  bool logWarning(const std::string &strMessage);
-  bool logError(const std::string &strMessage);
-  bool logFatalError(const std::string &strMessage);
+  bool logWarning(const std::string& strMessage);
+  bool logError(const std::string& strMessage);
+  bool logFatalError(const std::string& strMessage);
 
-  Log &operator<<(const EErrorLevel eLvl);
-  Log &operator<<(Log &(*logmanipulator)(Log &));
+  Log& operator<<(EErrorLevel eLvl);
+  Log& operator<<(Log& (*logmanipulator)(Log&) );
 
-  Log &operator<<(const char *pc);
-  Log &operator<<(const std::string &str);
+  Log& operator<<(const char* pc);
+  Log& operator<<(const std::string& str);
 
-  Log &operator<<(const bool b);
-  Log &operator<<(const float f);
-  Log &operator<<(const double d);
+  Log& operator<<(bool b);
+  Log& operator<<(float f);
+  Log& operator<<(double d);
 
-  Log &operator<<(const short int i);
-  Log &operator<<(const unsigned short int i);
-  Log &operator<<(const int i);
-  Log &operator<<(const unsigned int i);
-  Log &operator<<(const long long i);
-  Log &operator<<(const unsigned long long i);
+  Log& operator<<(short int i);
+  Log& operator<<(unsigned short int i);
+  Log& operator<<(int i);
+  Log& operator<<(unsigned int i);
+  Log& operator<<(long long i);
+  Log& operator<<(unsigned long long i);
 
   void flush();
 
@@ -72,7 +73,7 @@ public:
 
   bool isSilent();
 
-  ~Log(void);
+  ~Log();
 
   static Log &endl(Log &log);
   static Log &flush(Log &log);
@@ -80,7 +81,7 @@ public:
 private:
   explicit Log();
 
-  void init(std::string strLogName);
+  void init(const std::string& strLogName);
 
   template <typename T> static std::string toString(T n);
 
@@ -95,7 +96,7 @@ private:
   static std::map<std::string, Log *> sm_mapLogs;
   static Log *sm_pDefaultLog;
 
-  static std::string sm_astrLogLevelToPrefix[];
+  static const std::string sm_astrLogLevelToPrefix[];
   static const unsigned int sm_uiMaxLogLevel = 3;
 };
 

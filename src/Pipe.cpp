@@ -1,19 +1,16 @@
 
 #include "Pipe.h"
 
+#include <memory>
+
 #include "Log.h"
 
-Pipe::Pipe(bool waitForSlowestFilter, bool bBuffered )
-	: m_bBuffered( bBuffered )
-	, m_waitForSlowestFilter( waitForSlowestFilter )
-	, m_bEnabled( true )
+Pipe::Pipe(bool waitForSlowestFilter, bool bBuffered)
+    : m_bBuffered(bBuffered)
+    , m_waitForSlowestFilter(waitForSlowestFilter)
+    , m_bEnabled(true)
 {
-	m_spElem = nullptr;
-}
-
-
-Pipe::~Pipe()
-{
+    m_spElem = nullptr;
 }
 
 std::shared_ptr<PipeData> Pipe::pop()
@@ -96,19 +93,22 @@ NullPipe::NullPipe(int msecsBetweenPops)
 
 std::shared_ptr<PipeData> NullPipe::pop()
 {
-	return std::shared_ptr<PipeData>(new PipeData);
+    return std::make_shared<PipeData>();
 }
 
 std::shared_ptr<PipeData> NullPipe::blockingPop()
 {
-	if( m_wait )
-	{
-		std::chrono::high_resolution_clock::time_point tNow = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<int, std::milli> time_span = std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(tNow - m_lastPop);
+    if (m_wait) {
+        std::chrono::high_resolution_clock::time_point tNow =
+            std::chrono::high_resolution_clock::now();
+        std::chrono::duration<int, std::milli> time_span =
+            std::chrono::duration_cast<std::chrono::duration<int, std::milli>>(
+                tNow - m_lastPop);
 
-		Thread::sleep( static_cast<unsigned int>( std::max( m_msecsBetweenPops - time_span.count(), 0 ) ) );
-		m_lastPop = std::chrono::high_resolution_clock::now();
-	}
+        Thread::sleep(static_cast<unsigned int>(
+            std::max(m_msecsBetweenPops - time_span.count(), 0)));
+        m_lastPop = std::chrono::high_resolution_clock::now();
+    }
 
-	return std::shared_ptr<PipeData>(new PipeData);
+    return std::make_shared<PipeData>();
 }

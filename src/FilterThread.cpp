@@ -26,7 +26,7 @@ FilterThread::FilterThread( Pipe* pOutput, Filter* pFilter, Pipe* pInput, bool b
 FilterThread::~FilterThread()
 {
 	if( m_bFilterThreadActive )
-		stop();
+        FilterThread::stop();
 }
 
 
@@ -97,7 +97,7 @@ MultiFilterThread::MultiFilterThread( Pipe* pOutput, MultiFilter* pMultiFilter, 
 MultiFilterThread::~MultiFilterThread()
 {
 	if( m_bFilterThreadActive )
-		stop();
+        MultiFilterThread::stop();
 }
 
 /**

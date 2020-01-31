@@ -19,12 +19,12 @@ public:
         , frameTimeStamp(HighResClock::now())
     {}
 
-    PipeData(PipeData* prevData)
+    explicit PipeData(PipeData* prevData)
         : dataID(prevData->dataID)
         , frameTimeStamp(prevData->frameTimeStamp)
     {}
 
-    virtual ~PipeData() {}
+    virtual ~PipeData() = default;
 
     const unsigned int dataID;
     HighResTimeStamp frameTimeStamp;
