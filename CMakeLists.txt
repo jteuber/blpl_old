@@ -18,15 +18,15 @@ set(SOURCES
 )
 
 set(HEADERS
-    Pipeline/Filter.h
-    Pipeline/FilterThread.h
-    Pipeline/Log.h
-    Pipeline/Pipe.h
-    Pipeline/Pipeline.h
-    Pipeline/Pipeline_global.h
-    Pipeline/Profiler.h
-    Pipeline/Thread.h
-    Pipeline/utils.h
+    include/Filter.h
+    include/FilterThread.h
+    include/Log.h
+    include/Pipe.h
+    include/Pipeline.h
+    include/Pipeline_global.h
+    include/Profiler.h
+    include/Thread.h
+    include/utils.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})

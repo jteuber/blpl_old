@@ -73,3 +73,9 @@ Thumbs.db
 
 # QtCreator
 *.txt.user
+
+# Visual Studio Code
+.vscode
+
+# build files
+*build*
