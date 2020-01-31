@@ -6,20 +6,17 @@
 #include <memory>
 #include <vector>
 
-typedef std::chrono::time_point<std::chrono::high_resolution_clock,
-                                std::chrono::duration<double>>
-    highResTimeStamp;
+using HighResClock = std::chrono::high_resolution_clock;
+using HighResTimeStamp =
+    std::chrono::time_point<std::chrono::high_resolution_clock,
+                            std::chrono::duration<double>>;
 
 class PIPELINE_EXPORT PipeData
 {
-private:
-    friend class Pipeline;
-    static unsigned int sm_lastID;
-
 public:
     PipeData()
         : dataID(++sm_lastID)
-        , frameTimeStamp(std::chrono::high_resolution_clock::now())
+        , frameTimeStamp(HighResClock::now())
     {}
 
     PipeData(PipeData* prevData)
@@ -30,5 +27,10 @@ public:
     virtual ~PipeData() {}
 
     const unsigned int dataID;
-    highResTimeStamp frameTimeStamp;
+    HighResTimeStamp frameTimeStamp;
+
+    static void reset() { sm_lastID = 0; }
+
+private:
+    static unsigned int sm_lastID;
 };

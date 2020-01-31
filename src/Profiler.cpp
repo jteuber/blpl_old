@@ -1,12 +1,16 @@
 #include "Profiler.h"
 
 Profiler::Profiler(std::string className)
+#ifdef PROFILE
     : m_log(Log::getLog(className))
 {
-#ifdef PROFILE
     m_log.setSilentMode(true);
-#endif
 }
+#else
+{
+    /*unused*/ (void) className;
+}
+#endif
 
 void Profiler::startCycle()
 {

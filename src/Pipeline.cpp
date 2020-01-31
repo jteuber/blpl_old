@@ -113,7 +113,7 @@ void Pipeline::reset() {
   for (auto pipe : m_pipes)
     pipe->reset();
 
-  PipeData::sm_lastID = 0;
+  PipeData::reset();
 }
 
 std::shared_ptr<PipeData> Pipeline::step() {
