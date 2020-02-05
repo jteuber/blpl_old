@@ -9,12 +9,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include_directories(include)
 
 set(SOURCES
-    src/FilterThread.cpp
     src/Log.cpp
-    src/Pipe.cpp
-    src/Pipeline.cpp
     src/Profiler.cpp
-    src/Thread.cpp
 )
 
 set(HEADERS
@@ -25,8 +21,6 @@ set(HEADERS
     include/Pipeline.h
     include/Pipeline_global.h
     include/Profiler.h
-    include/Thread.h
-    include/utils.h
 )
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
