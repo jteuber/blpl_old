@@ -39,6 +39,7 @@ public:
     void start() override;
     void stop() override;
 
+private:
     void run();
 
 private:
@@ -47,6 +48,7 @@ private:
     std::shared_ptr<Pipe<OutData>> m_outPipe;
 
     volatile bool m_bFilterThreadActive;
+    volatile bool m_bFiltering;
     bool m_bSelfManaged;
     std::thread m_thread;
 };
@@ -71,6 +73,7 @@ FilterThread<InData, OutData>::FilterThread(
     , m_filter(filter)
     , m_outPipe(outPipe)
     , m_bFilterThreadActive(false)
+    , m_bFiltering(false)
     , m_bSelfManaged(bSelfManaged)
 {}
 
@@ -80,7 +83,7 @@ FilterThread<InData, OutData>::FilterThread(
 template <class InData, class OutData>
 FilterThread<InData, OutData>::~FilterThread()
 {
-    if (m_bFilterThreadActive)
+    if (m_bFiltering)
         FilterThread<InData, OutData>::stop();
 }
 
@@ -93,7 +96,7 @@ FilterThread<InData, OutData>::~FilterThread()
 template <class InData, class OutData>
 bool FilterThread<InData, OutData>::isFiltering()
 {
-    return m_bFilterThreadActive;
+    return m_bFiltering;
 }
 
 /**
@@ -111,13 +114,15 @@ void FilterThread<InData, OutData>::start()
 template <class InData, class OutData>
 void FilterThread<InData, OutData>::stop()
 {
-    m_bFilterThreadActive = false;
-    m_inPipe->disable();
-    m_inPipe->reset();
+    if (m_bFiltering) {
+        m_bFilterThreadActive = false;
+        m_inPipe->reset();
+        m_inPipe->disable();
 
-    m_thread.join();
+        m_thread.join();
 
-    m_inPipe->enable();
+        m_inPipe->enable();
+    }
 }
 
 /**
@@ -128,7 +133,11 @@ template <class InData, class OutData>
 void FilterThread<InData, OutData>::run()
 {
     m_bFilterThreadActive = true;
+    m_bFiltering          = true;
     do {
-        m_outPipe->push(m_filter->process(m_inPipe->blockingPop()));
+        InData temp = m_inPipe->blockingPop();
+        if (m_bFilterThreadActive)
+            m_outPipe->push(m_filter->process(std::move(temp)));
     } while (m_bFilterThreadActive && m_bSelfManaged);
+    m_bFiltering = false;
 }

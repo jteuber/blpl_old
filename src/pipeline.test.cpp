@@ -23,17 +23,38 @@ public:
     void reset() override {}
 };
 
-TEST_CASE("Pipeline construction")
+class TestFilter3 : public Filter<std::string, std::string>
+{
+public:
+    std::string processImpl(std::string&& in) override
+    {
+        return std::move(in);
+    }
+    void reset() override {}
+};
+
+TEST_CASE("simple pipeline construction")
 {
     auto filter1 = std::make_shared<TestFilter1>();
     auto filter2 = std::make_shared<TestFilter2>();
-
-    CHECK(std::string(typeid(*filter1).name()).find("TestFilter1") !=
-          std::string::npos);
 
     auto pipeline =
         std::static_pointer_cast<Filter<int, float>>(filter1) |
         std::static_pointer_cast<Filter<float, std::string>>(filter2);
 
-    CHECK(pipeline.m_filters.size() == 2);
+    REQUIRE(pipeline.m_filters.size() == 2);
+}
+
+TEST_CASE("bigger pipeline construction")
+{
+    auto filter1 = std::make_shared<TestFilter1>();
+    auto filter2 = std::make_shared<TestFilter2>();
+    auto filter3 = std::make_shared<TestFilter3>();
+
+    auto pipeline =
+        std::static_pointer_cast<Filter<int, float>>(filter1) |
+        std::static_pointer_cast<Filter<float, std::string>>(filter2) |
+        std::static_pointer_cast<Filter<std::string, std::string>>(filter3);
+
+    REQUIRE(pipeline.m_filters.size() == 3);
 }
