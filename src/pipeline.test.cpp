@@ -12,6 +12,7 @@ public:
     }
     void reset() override {}
 };
+
 class TestFilter2 : public Filter<float, std::string>
 {
 public:
@@ -27,7 +28,8 @@ TEST_CASE("Pipeline construction")
     auto filter1 = std::make_shared<TestFilter1>();
     auto filter2 = std::make_shared<TestFilter2>();
 
-    CHECK(typeid(*filter1).name() == "TestFilter1");
+    CHECK(std::string(typeid(*filter1).name()).find("TestFilter1") !=
+          std::string::npos);
 
     auto pipeline =
         std::static_pointer_cast<Filter<int, float>>(filter1) |

@@ -70,7 +70,7 @@ FilterThread<InData, OutData>::FilterThread(
     : m_inPipe(inPipe)
     , m_filter(filter)
     , m_outPipe(outPipe)
-    , m_bFilterThreadActive(true)
+    , m_bFilterThreadActive(false)
     , m_bSelfManaged(bSelfManaged)
 {}
 
@@ -81,7 +81,7 @@ template <class InData, class OutData>
 FilterThread<InData, OutData>::~FilterThread()
 {
     if (m_bFilterThreadActive)
-        stop();
+        FilterThread<InData, OutData>::stop();
 }
 
 /**

@@ -52,7 +52,7 @@ operator|(Pipeline<InData, IntermediateData>&& pipeline,
 
     // prepare the pipes
     auto betweenPipe = pipeline.m_outPipe;
-    newPipeline.m_outPipe.reset(std::make_shared<Pipe<OutData>>());
+    newPipeline.m_outPipe = std::make_shared<Pipe<OutData>>();
 
     // add the filter thread
     newPipeline.m_filters.push_back(
