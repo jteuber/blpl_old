@@ -10,21 +10,21 @@
  * @tparam TData Type of the data to pass through the Pipe.
  */
 template <typename TData>
-class PIPELINE_EXPORT Pipe
-{
+class PIPELINE_EXPORT Pipe {
 public:
     explicit Pipe(bool waitForSlowestFilter = false);
     virtual ~Pipe() = default;
 
-    virtual TData pop();
-    virtual TData blockingPop();
-    virtual void push(TData&& data);
-    virtual void reset();
+    TData pop();
+    TData blockingPop();
+
+    void push(TData &&data);
+    void reset();
 
     void disable();
     void enable();
 
-    virtual unsigned int size();
+    unsigned int size();
 
 private:
     TData m_elem;
@@ -94,13 +94,3 @@ unsigned int Pipe<TData>::size()
 {
     return m_valid ? 1 : 0;
 }
-
-template <>
-class PIPELINE_EXPORT Pipe<void>
-{
-public:
-    unsigned int size()
-    {
-        return 1;
-    }
-};
