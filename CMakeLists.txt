@@ -11,7 +11,8 @@ include_directories(include)
 set(SOURCES
         src/Log.cpp
         src/Profiler.cpp
-        src/AbstractPipeline.cpp)
+        src/AbstractPipeline.cpp
+        src/AbstractPipe.cpp)
 
 set(HEADERS
         include/Filter.h
@@ -21,7 +22,8 @@ set(HEADERS
         include/Pipeline.h
         include/Pipeline_global.h
         include/Profiler.h
-        include/AbstractPipeline.h)
+        include/AbstractPipeline.h
+        include/AbstractPipe.h)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 

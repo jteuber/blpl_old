@@ -2,15 +2,18 @@
 
 #include "Pipeline_global.h"
 
-#include <atomic>
 #include <thread>
+
+#include "AbstractPipe.h"
+#include "PipeData.h"
 
 /**
  * Implements the pipes in the pipeline.
  * @tparam TData Type of the data to pass through the Pipe.
  */
 template <typename TData>
-class PIPELINE_EXPORT Pipe {
+class PIPELINE_EXPORT Pipe : public AbstractPipe
+{
 public:
     explicit Pipe(bool waitForSlowestFilter = false);
     virtual ~Pipe() = default;
@@ -19,26 +22,14 @@ public:
     TData blockingPop();
 
     void push(TData &&data);
-    void reset();
-
-    void disable();
-    void enable();
-
-    unsigned int size();
 
 private:
     TData m_elem;
-    std::atomic<bool> m_valid;
-
-    bool m_waitForSlowestFilter;
-    bool m_enabled;
 };
 
 template <typename TData>
 Pipe<TData>::Pipe(bool waitForSlowestFilter)
-    : m_valid(false)
-    , m_waitForSlowestFilter(waitForSlowestFilter)
-    , m_enabled(true)
+    : AbstractPipe(waitForSlowestFilter)
 {}
 
 template <typename TData>
@@ -71,26 +62,22 @@ void Pipe<TData>::push(TData&& data)
     m_valid = true;
 }
 
-template <typename TData>
-void Pipe<TData>::reset()
+/// GENERATOR PIPE
+template <>
+class PIPELINE_EXPORT Pipe<Generator> : public AbstractPipe
 {
-    m_valid = false;
-}
+public:
+    explicit Pipe(bool waitForSlowestFilter = false)
+        : AbstractPipe(waitForSlowestFilter)
+    {}
+    virtual ~Pipe() = default;
 
-template <typename TData>
-void Pipe<TData>::disable()
-{
-    m_enabled = false;
-}
-
-template <typename TData>
-void Pipe<TData>::enable()
-{
-    m_enabled = true;
-}
-
-template <typename TData>
-unsigned int Pipe<TData>::size()
-{
-    return m_valid ? 1 : 0;
-}
+    Generator pop()
+    {
+        return Generator();
+    }
+    Generator blockingPop()
+    {
+        return Generator();
+    }
+};

@@ -16,6 +16,10 @@ public:
     Pipeline(std::shared_ptr<Filter<InData, IntermediateData>> first,
              std::shared_ptr<Filter<IntermediateData, OutData>> second);
 
+    template <class IntermediateData>
+    Pipeline(Pipeline<InData, IntermediateData>&& pipeline,
+             std::shared_ptr<Filter<IntermediateData, OutData>> extender);
+
     template<class ExtendedData>
     Pipeline<InData, ExtendedData>
     operator|(std::shared_ptr<Filter<OutData, ExtendedData>> filter);
@@ -26,26 +30,36 @@ private:
 private:
     std::shared_ptr<Pipe<InData>> m_inPipe;
     std::shared_ptr<Pipe<OutData>> m_outPipe;
+
+    template <class, class>
+    friend class Pipeline;
 };
 
 template<class InData, class OutData>
 template<class ExtendedData>
 Pipeline<InData, ExtendedData> Pipeline<InData, OutData>::operator|(
-    std::shared_ptr<Filter<OutData, ExtendedData>> filter) {
-    Pipeline<InData, ExtendedData> newPipeline;
-    newPipeline.m_inPipe = std::move(m_inPipe);
-    newPipeline.m_filters = std::move(m_filters);
+    std::shared_ptr<Filter<OutData, ExtendedData>> filter)
+{
+    return Pipeline<InData, ExtendedData>(std::move(*this), filter);
+}
+
+template <class InData, class OutData>
+template <class IntermediateData>
+Pipeline<InData, OutData>::Pipeline(
+    Pipeline<InData, IntermediateData>&& pipeline,
+    std::shared_ptr<Filter<IntermediateData, OutData>> extender)
+{
+    m_inPipe  = std::move(pipeline.m_inPipe);
+    m_filters = std::move(pipeline.m_filters);
 
     // prepare the pipes
-    auto betweenPipe = m_outPipe;
-    newPipeline.m_outPipe = std::make_shared<Pipe<OutData>>();
+    auto betweenPipe = std::move(pipeline.m_outPipe);
+    m_outPipe = std::make_shared<Pipe<OutData>>();
 
     // add the filter thread
-    newPipeline.m_filters.push_back(
-        std::make_shared<FilterThread<OutData, ExtendedData>>(
-            betweenPipe, filter, newPipeline.m_outPipe));
-
-    return newPipeline;
+    m_filters.push_back(
+        std::make_shared<FilterThread<IntermediateData, OutData>>(
+            betweenPipe, extender, m_outPipe));
 }
 
 template<class InData, class OutData>

@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 
+#include "AbstractPipe.h"
 #include "Filter.h"
 #include "Pipe.h"
 
