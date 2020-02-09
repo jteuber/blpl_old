@@ -1,5 +1,5 @@
-Name: Pipeline
+Name: blpl
 Version: 0.1.0
-Namespace: org.jaytea
+Namespace: org.jaytea.blpl
 
 Test-Driver: Catch-Main
