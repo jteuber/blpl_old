@@ -3,34 +3,18 @@
 #include "Pipeline_global.h"
 
 #include <chrono>
-#include <memory>
-#include <vector>
+#include <thread>
 
 using HighResClock = std::chrono::high_resolution_clock;
 using HighResTimeStamp =
     std::chrono::time_point<std::chrono::high_resolution_clock,
                             std::chrono::duration<double>>;
 
-class PIPELINE_EXPORT PipeData
+class PIPELINE_EXPORT Generator
 {
 public:
-    PipeData()
-        : dataID(++sm_lastID)
-        , frameTimeStamp(HighResClock::now())
-    {}
-
-    explicit PipeData(PipeData* prevData)
-        : dataID(prevData->dataID)
-        , frameTimeStamp(prevData->frameTimeStamp)
-    {}
-
-    virtual ~PipeData() = default;
-
-    const unsigned int dataID;
-    HighResTimeStamp frameTimeStamp;
-
-    static void reset() { sm_lastID = 0; }
-
-private:
-    static unsigned int sm_lastID;
+    explicit Generator(HighResTimeStamp finishAt) {
+        std::this_thread::sleep_until(finishAt);
+    }
+    Generator() = default;
 };

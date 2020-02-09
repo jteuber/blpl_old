@@ -2,60 +2,82 @@
 
 #include "Pipeline_global.h"
 
-#include <memory>
-#include <mutex>
-#include <queue>
+#include <thread>
 
+#include "AbstractPipe.h"
 #include "PipeData.h"
-#include "Thread.h"
 
-class PIPELINE_EXPORT Pipe
+/**
+ * Implements the pipes in the pipeline.
+ * @tparam TData Type of the data to pass through the Pipe.
+ */
+template <typename TData>
+class PIPELINE_EXPORT Pipe : public AbstractPipe
 {
 public:
-    explicit Pipe(bool waitForSlowestFilter = false, bool bBuffered = false);
+    explicit Pipe(bool waitForSlowestFilter = false);
     virtual ~Pipe() = default;
 
-    virtual std::shared_ptr<PipeData> pop();
-    virtual std::shared_ptr<PipeData> blockingPop();
-    virtual void push(const std::shared_ptr<PipeData>& pData);
-    virtual void reset();
+    TData pop();
+    TData blockingPop();
 
-    virtual void disable();
-    virtual void enable();
-
-    virtual unsigned int size();
+    void push(TData &&data);
 
 private:
-    std::shared_ptr<PipeData> m_spElem;
-    std::mutex m_mutex;
-
-    bool m_bBuffered;
-    bool m_waitForSlowestFilter;
-
-    bool m_bEnabled;
+    TData m_elem;
 };
 
-class PIPELINE_EXPORT NullPipe : public Pipe
+template <typename TData>
+Pipe<TData>::Pipe(bool waitForSlowestFilter)
+    : AbstractPipe(waitForSlowestFilter)
+{}
+
+template <typename TData>
+TData Pipe<TData>::pop()
+{
+    TData temp = std::move(m_elem);
+    m_valid    = false;
+    return temp;
+}
+
+template <typename TData>
+TData Pipe<TData>::blockingPop()
+{
+    while (!m_valid && m_enabled)
+        std::this_thread::yield();
+
+    return pop();
+}
+
+template <typename TData>
+void Pipe<TData>::push(TData&& data)
+{
+    while (m_waitForSlowestFilter && m_valid && m_enabled)
+        std::this_thread::yield();
+
+    if (!m_enabled)
+        return;
+
+    m_elem  = std::move(data);
+    m_valid = true;
+}
+
+/// GENERATOR PIPE
+template <>
+class PIPELINE_EXPORT Pipe<Generator> : public AbstractPipe
 {
 public:
-    explicit NullPipe(int msecsBetweenPops = 0);
+    explicit Pipe(bool waitForSlowestFilter = false)
+        : AbstractPipe(waitForSlowestFilter)
+    {}
+    virtual ~Pipe() = default;
 
-    std::shared_ptr<PipeData> pop() override;
-    std::shared_ptr<PipeData> blockingPop() override;
-    void push(const std::shared_ptr<PipeData>& /*pData*/) override {}
-    void reset() override {}
-
-    void disable() override {}
-    void enable() override {}
-
-    unsigned int size() override
+    Generator pop()
     {
-        return 1;
+        return Generator();
     }
-
-private:
-    bool m_wait;
-    int m_msecsBetweenPops;
-
-    std::chrono::high_resolution_clock::time_point m_lastPop;
+    Generator blockingPop()
+    {
+        return Generator();
+    }
 };
