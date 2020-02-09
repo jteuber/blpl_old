@@ -311,7 +311,7 @@ Log& Log::operator<<(const EErrorLevel eLvl)
  */
 Log& Log::operator<<(Log& (*logmanipulator)(Log&) )
 {
-    return (Log&) logmanipulator(*this);
+    return std::forward<Log &>(logmanipulator(*this));
 }
 
 Log& Log::operator<<(const char* pc)
