@@ -3,17 +3,14 @@
 
 #include <catch2/catch.hpp>
 
-template <class InData, class OutData>
-using FilterPtr = std::shared_ptr<Filter<InData, OutData>>;
-
 class TestFilter0 : public Filter<Generator, int>
 {
 public:
     int processImpl(Generator&&) override
     {
-        if (m_i<10)
+        if (m_i<100)
             return m_i++;
-        return 10;
+        return m_i;
     }
 
     void reset() override { m_i = 0; }
@@ -28,8 +25,6 @@ public:
     {
         return static_cast<float>(in) / 2.f;
     }
-
-    void reset() override {}
 };
 
 class TestFilter2 : public Filter<float, std::string>
@@ -39,7 +34,6 @@ public:
     {
         return std::to_string(in);
     }
-    void reset() override {}
 };
 
 class TestFilter3 : public Filter<std::string, std::string>
@@ -50,8 +44,6 @@ public:
         m_lastInput = in;
         return std::move(in);
     }
-
-    void reset() override {}
 
     std::string m_lastInput;
 };
@@ -93,9 +85,11 @@ TEST_CASE("pipeline test")
     REQUIRE(pipeline.length() == 4);
 
     pipeline.start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    int output = 0;
+    while (output++ < 100)
+        pipeline.outPipe()->blockingPop();
     pipeline.stop();
 
-    REQUIRE(filter0->m_i == 10);
-    REQUIRE(std::stoi(filter3->m_lastInput) == 5);
+    REQUIRE(filter0->m_i == 100);
+    REQUIRE(std::stoi(filter3->m_lastInput) == 50);
 }

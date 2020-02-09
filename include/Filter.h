@@ -14,15 +14,13 @@ class PIPELINE_EXPORT AbstractFilter
      * original state, so that the next call of Filter::process behaves like
      * this object was just created.
      */
-    virtual void reset() = 0;
+    virtual void reset() {};
 };
 
 /**
  * @brief This is the interface for all filters of the pipeline. It takes an
  * input, processes it and produces an output to be processed by the next
  * filter.
- * This type of filter only takes one input PipeData.For multiple inputs looks
- * at MultiFilter
  */
 template <class InData, class OutData>
 class PIPELINE_EXPORT Filter : public AbstractFilter
@@ -56,11 +54,7 @@ private:
     Profiler m_prof;
 };
 
-/**
- * @brief This is the interface for all filters of the pipeline which take
- * multiple input PipeData and output a single PipeData instance.
- */
-/*template<class InData, class OutData>
-class PIPELINE_EXPORT MultiFilter : public Filter<std::vector<InData>, OutData>
-{
-};*/
+/// Convenience type for shared_ptr to filters
+template <class InData, class OutData>
+using FilterPtr = std::shared_ptr<Filter<InData, OutData>>;
+

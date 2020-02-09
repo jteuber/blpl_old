@@ -8,7 +8,11 @@
 #include "FilterThread.h"
 #include "Pipe.h"
 
-/// GENERAL CLASS CASE
+/**
+ * Main pipeline class.
+ * @tparam InData The datatype that goes into the pipeline.
+ * @tparam OutData The datatype that is produced by the pipeline.
+ */
 template <class InData, class OutData>
 class Pipeline : public AbstractPipeline {
 public:
@@ -23,6 +27,11 @@ public:
     template<class ExtendedData>
     Pipeline<InData, ExtendedData>
     operator|(std::shared_ptr<Filter<OutData, ExtendedData>> filter);
+
+    std::shared_ptr<Pipe<OutData>> outPipe()
+    {
+        return m_outPipe;
+    }
 
 private:
     explicit Pipeline() = default;
