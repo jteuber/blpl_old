@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+namespace blpl {
+
 std::map<std::string, Log*> Log::sm_mapLogs;
 Log* Log::sm_pDefaultLog = nullptr;
 
@@ -311,7 +313,7 @@ Log& Log::operator<<(const EErrorLevel eLvl)
  */
 Log& Log::operator<<(Log& (*logmanipulator)(Log&) )
 {
-    return std::forward<Log &>(logmanipulator(*this));
+    return std::forward<Log&>(logmanipulator(*this));
 }
 
 Log& Log::operator<<(const char* pc)
@@ -411,4 +413,6 @@ template <typename T>
 std::string Log::toString(T n)
 {
     return std::to_string(n);
+}
+
 }

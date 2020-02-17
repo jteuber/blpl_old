@@ -9,6 +9,8 @@
 #include "Filter.h"
 #include "Pipe.h"
 
+namespace blpl {
+
 class PIPELINE_EXPORT AbstractFilterThread
 {
 public:
@@ -141,4 +143,6 @@ void FilterThread<InData, OutData>::run()
             m_outPipe->push(m_filter->process(std::move(temp)));
     } while (m_bFilterThreadActive && m_bSelfManaged);
     m_bFiltering = false;
+}
+
 }

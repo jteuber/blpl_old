@@ -4,7 +4,10 @@
 
 #include "FilterThread.h"
 
-class AbstractPipeline {
+namespace blpl {
+
+class AbstractPipeline
+{
 public:
     void start();
     void stop();
@@ -14,3 +17,5 @@ public:
 protected:
     std::list<std::shared_ptr<AbstractFilterThread>> m_filters;
 };
+
+}

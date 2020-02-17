@@ -1,5 +1,7 @@
 #include "Profiler.h"
 
+namespace blpl {
+
 Profiler::Profiler(const std::string& className)
 #ifdef PROFILE
     : m_log(Log::getLog(className))
@@ -31,4 +33,6 @@ void Profiler::endCycle()
 
     m_log << time_span.count() << Log::endl;
 #endif
+}
+
 }

@@ -1,11 +1,12 @@
 #include "AbstractPipe.h"
 
+namespace blpl {
+
 AbstractPipe::AbstractPipe(bool waitForSlowestFilter)
     : m_valid(false)
     , m_waitForSlowestFilter(waitForSlowestFilter)
     , m_enabled(true)
-{
-}
+{}
 
 void AbstractPipe::reset()
 {
@@ -25,4 +26,6 @@ void AbstractPipe::enable()
 unsigned int AbstractPipe::size()
 {
     return m_valid ? 1 : 0;
+}
+
 }

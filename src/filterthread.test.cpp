@@ -2,6 +2,8 @@
 
 #include <catch2/catch.hpp>
 
+using namespace blpl;
+
 class Passthrough : public Filter<int, int>
 {
 public:
