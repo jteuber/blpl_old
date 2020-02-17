@@ -22,7 +22,6 @@ public:
 
 #ifdef PROFILE
 private:
-    std::string m_className;
     Log m_log;
 
     std::chrono::high_resolution_clock::time_point m_tStart;

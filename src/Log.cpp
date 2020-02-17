@@ -4,22 +4,22 @@
 
 namespace blpl {
 
-std::map<std::string, Log*> Log::sm_mapLogs;
-Log* Log::sm_pDefaultLog = nullptr;
-
-const std::string Log::sm_astrLogLevelToPrefix[] = {
+namespace {
+const char* logLevelToPrefix[] = {
     "INFO       : ", "WARNING    : ", "ERROR      : ", "FATAL ERROR: "};
+const unsigned int maxLogLevel = 3;
+}
 
 /**
  * @brief	Constructor.
  *
  * @param	strLogName	Name of the log.
  */
-Log::Log()
+Log::Log(const std::string& strLogName)
     : m_elLowestLoggedLevel(EL_INFO)
     , m_elLastStreamLogLvl(EL_INFO)
     , m_bSilent(false)
-    , m_pLogFile(nullptr)
+    , m_logFile(strLogName)
 {}
 
 /**
@@ -28,98 +28,7 @@ Log::Log()
 Log::~Log()
 {
     flush();
-    if (m_pLogFile)
-        fclose(m_pLogFile);
-    //	m_fsLogFile.close();
-    delete m_pLogFile;
-}
-
-void Log::init(const std::string& strLogName)
-{
-    m_pLogFile = new FILE;
-#ifdef WIN32
-    fopen_s(&m_pLogFile,
-            std::string(strLogName + std::string(".log")).c_str(),
-            "w");
-#else
-    m_pLogFile =
-        fopen(std::string(strLogName + std::string(".log")).c_str(), "w");
-#endif
-}
-
-/**
- * @brief	get the log with the given name.
- *
- * @param	strLogName	Name of the log.
- *
- * @return	null if it fails, else the log.
- */
-Log* Log::getLogPtr(const std::string& strLogName)
-{
-    auto it = sm_mapLogs.find(strLogName);
-    if (it == sm_mapLogs.end()) {
-        std::pair<std::map<std::string, Log*>::iterator, bool> ret =
-            sm_mapLogs.insert(std::make_pair(strLogName, new Log()));
-        ret.first->second->init(strLogName);
-        return ret.first->second;
-    } else
-        return it->second;
-}
-
-/**
- * @brief	get a reference to the log with the given name.
- *
- * @param	strLogName	Name of the log.
- *
- * @return	null if it fails, else the log.
- */
-Log& Log::getLog(const std::string& strLogName)
-{
-    return *getLogPtr(strLogName);
-}
-
-/**
- * @brief	Gets the default log.
- *
- * @return	null if it fails, else the default log.
- */
-Log* Log::getDefaultLogPtr()
-{
-    if (!sm_pDefaultLog)
-        sm_pDefaultLog = getLogPtr("default");
-    return sm_pDefaultLog;
-}
-
-/**
- * @brief	Get a reference to the default log.
- *
- * @return	null if it fails, else the default log.
- */
-Log& Log::getDefaultLog()
-{
-    if (!sm_pDefaultLog)
-        sm_pDefaultLog = getLogPtr("default");
-    return *sm_pDefaultLog;
-}
-
-/**
- * @brief	Sets the name of the default log.
- *
- * @param	strDefaultLogName	The name of the default log.
- */
-void Log::setDefaultLog(const std::string& strDefaultLogName)
-{
-    sm_pDefaultLog = getLogPtr(strDefaultLogName);
-}
-
-/**
- * @brief	destroys the multiton, cleaning up all taken memory.
- */
-void Log::destroy()
-{
-    for (auto& it : sm_mapLogs)
-        delete it.second;
-    sm_mapLogs.clear();
+    m_logFile.close();
 }
 
 /**
@@ -133,12 +42,12 @@ void Log::destroy()
  *
  * @return	true if the message was logged, false if not.
  */
-bool Log::logMessage(const std::string& strMessage, EErrorLevel elErrorLevel)
+bool Log::logMessage(const std::string& strMessage, ErrorLevel elErrorLevel)
 {
-    if (elErrorLevel < m_elLowestLoggedLevel || elErrorLevel > sm_uiMaxLogLevel)
+    if (elErrorLevel < m_elLowestLoggedLevel || elErrorLevel > maxLogLevel)
         return false;
 
-    std::string strPrefix = sm_astrLogLevelToPrefix[elErrorLevel];
+    std::string strPrefix = logLevelToPrefix[elErrorLevel];
 
     m_strLogText += strPrefix + strMessage + "\n";
 
@@ -241,9 +150,9 @@ void Log::flush()
     //	m_fsLogFile << m_strLogText;
     //	m_fsLogFile << m_ssLogStream.str();
     //	m_fsLogFile.flush();
-    if (m_pLogFile) {
-        fputs(m_strLogText.c_str(), m_pLogFile);
-        fflush(m_pLogFile);
+    if (m_logFile.is_open()) {
+        m_logFile.write(m_strLogText.c_str(), m_strLogText.length());
+        m_logFile.flush();
 
         m_strLogText.clear();
     }
@@ -257,7 +166,7 @@ void Log::flush()
  *
  * @param	elLowestLoggedLevel	The lowest logged message level.
  */
-void Log::setLogLevel(EErrorLevel elLowestLoggedLevel)
+void Log::setLogLevel(ErrorLevel elLowestLoggedLevel)
 {
     m_elLowestLoggedLevel = elLowestLoggedLevel;
 }
@@ -293,10 +202,10 @@ bool Log::isSilent()
  *
  * @return	a reference to this log
  */
-Log& Log::operator<<(const EErrorLevel eLvl)
+Log& Log::operator<<(const ErrorLevel eLvl)
 {
-    if (eLvl <= sm_uiMaxLogLevel) {
-        m_strLogText += sm_astrLogLevelToPrefix[eLvl];
+    if (eLvl <= maxLogLevel) {
+        m_strLogText += logLevelToPrefix[eLvl];
     }
 
     m_elLastStreamLogLvl = eLvl;
@@ -336,49 +245,49 @@ Log& Log::operator<<(const bool b)
 
 Log& Log::operator<<(const float f)
 {
-    m_strLogText += toString(f);
+    m_strLogText += std::to_string(f);
     return *this;
 }
 
 Log& Log::operator<<(const double d)
 {
-    m_strLogText += toString(d);
+    m_strLogText += std::to_string(d);
     return *this;
 }
 
 Log& Log::operator<<(const short int i)
 {
-    m_strLogText += toString(i);
+    m_strLogText += std::to_string(i);
     return *this;
 }
 
 Log& Log::operator<<(const unsigned short int i)
 {
-    m_strLogText += toString(i);
+    m_strLogText += std::to_string(i);
     return *this;
 }
 
 Log& Log::operator<<(const int i)
 {
-    m_strLogText += toString(i);
+    m_strLogText += std::to_string(i);
     return *this;
 }
 
 Log& Log::operator<<(const unsigned int i)
 {
-    m_strLogText += toString(i);
+    m_strLogText += std::to_string(i);
     return *this;
 }
 
 Log& Log::operator<<(const long long i)
 {
-    m_strLogText += toString(i);
+    m_strLogText += std::to_string(i);
     return *this;
 }
 
 Log& Log::operator<<(const unsigned long long i)
 {
-    m_strLogText += toString(i);
+    m_strLogText += std::to_string(i);
     return *this;
 }
 
@@ -407,12 +316,6 @@ Log& Log::flush(Log& log)
     }
 
     return log;
-}
-
-template <typename T>
-std::string Log::toString(T n)
-{
-    return std::to_string(n);
 }
 
 }

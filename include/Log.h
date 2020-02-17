@@ -2,8 +2,7 @@
 
 #include "Pipeline_global.h"
 
-#include <cstdio> // for FILE
-#include <map>
+#include <fstream>
 #include <string>
 
 namespace blpl {
@@ -18,12 +17,12 @@ class PIPELINE_EXPORT Log
 {
 public:
     /**
-     * @enum	EErrorLevel
+     * @enum	ErrorLevel
      *
      * @brief	Values that represent the importance of the logged message (aka
      * the error level ;) ).
      */
-    enum EErrorLevel
+    enum ErrorLevel
     {
         EL_INFO = 0, ///< Information
         EL_WARNING, ///< Problems or errors that were caught and do not have any
@@ -33,24 +32,18 @@ public:
         EL_FATAL_ERROR ///< Errors that crash the program
     };
 
-    static Log* getLogPtr(const std::string& strLogName);
-    static Log& getLog(const std::string& strLogName);
-
-    static Log* getDefaultLogPtr();
-    static Log& getDefaultLog();
-
-    static void setDefaultLog(const std::string& strDefaultLogName);
-    static void destroy();
+    explicit Log(const std::string& strLogName);
+    ~Log();
 
     bool logMessage(const std::string& strMessage,
-                    EErrorLevel elErrorLevel = EL_INFO);
+                    ErrorLevel elErrorLevel = EL_INFO);
 
     bool logInfo(const std::string& strMessage);
     bool logWarning(const std::string& strMessage);
     bool logError(const std::string& strMessage);
     bool logFatalError(const std::string& strMessage);
 
-    Log& operator<<(EErrorLevel eLvl);
+    Log& operator<<(ErrorLevel eLvl);
     Log& operator<<(Log& (*logmanipulator)(Log&) );
 
     Log& operator<<(const char* pc);
@@ -69,47 +62,21 @@ public:
 
     void flush();
 
-    void setLogLevel(EErrorLevel elLowestLoggedLevel);
+    void setLogLevel(ErrorLevel elLowestLoggedLevel);
     void setSilentMode(bool bSilent);
 
     bool isSilent();
-
-    ~Log();
 
     static Log& endl(Log& log);
     static Log& flush(Log& log);
 
 private:
-    explicit Log();
-
-    void init(const std::string& strLogName);
-
-    template <typename T>
-    static std::string toString(T n);
-
-private:
-    EErrorLevel m_elLowestLoggedLevel;
-    EErrorLevel m_elLastStreamLogLvl;
+    ErrorLevel m_elLowestLoggedLevel;
+    ErrorLevel m_elLastStreamLogLvl;
     bool m_bSilent;
 
     std::string m_strLogText;
-    FILE* m_pLogFile;
-
-    static std::map<std::string, Log*> sm_mapLogs;
-    static Log* sm_pDefaultLog;
-
-    static const std::string sm_astrLogLevelToPrefix[];
-    static const unsigned int sm_uiMaxLogLevel = 3;
+    std::ofstream m_logFile;
 };
-
-#ifdef __GNUG__
-#define LOGFILELINEFUNC                                                        \
-  "function \"" << __PRETTY_FUNCTION__ << "\" in file \"" __FILE__             \
-                << "\", line " << __LINE__
-#else
-#define LOGFILELINEFUNC                                                        \
-  "function \"" << __func__ << "\" in file \"" __FILE__ << "\", line "         \
-                << __LINE__
-#endif
 
 }
