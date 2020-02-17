@@ -28,7 +28,7 @@ in the library directory.
 ```c++
 // write a filter by inheriting Filter<InData,OutData>. *Generator* is a special type that tells the pipeline to
 // continuously call this filter.
-class StartFilter : public Filter<Generator, int>
+class StartFilter : public blpl::Filter<Generator, int>
 {
 public:
     // Implement your filter in processImpl
@@ -46,7 +46,7 @@ public:
 // and then a few more that do actual computation
 ...
 // and a last one that produces and maybe stores or shows the final output
-class EndFilter : public Filter<std::string, int>
+class EndFilter : public blpl::Filter<std::string, int>
 {
 public:
     // the payload in the pipes are moved to have as little overhead as possible. If you need shared resources just
@@ -61,10 +61,10 @@ public:
 int main() 
 {
     // instantiate the filters
-    auto startFilter = FilterPtr<Generator, int>(new StartFilter);
-    auto filter1 = FilterPtr<int, std::string>(new TestFilter1);
+    auto startFilter = blpl::FilterPtr<Generator, int>(new StartFilter);
+    auto filter1 = blpl::FilterPtr<int, std::string>(new TestFilter1);
     ...
-    auto endFilter = FilterPtr<std::string, int>(new EndFilter);
+    auto endFilter = blpl::FilterPtr<std::string, int>(new EndFilter);
     
     // build the pipeline
     auto pipeline = startFilter |
