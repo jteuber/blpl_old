@@ -4,6 +4,8 @@
 
 #include <atomic>
 
+namespace blpl {
+
 class AbstractPipe
 {
 public:
@@ -19,3 +21,5 @@ protected:
     bool m_waitForSlowestFilter;
     bool m_enabled;
 };
+
+}

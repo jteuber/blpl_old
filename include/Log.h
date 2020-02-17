@@ -1,11 +1,12 @@
-#ifndef LOG_H
-#define LOG_H
+#pragma once
 
 #include "Pipeline_global.h"
 
 #include <cstdio> // for FILE
 #include <map>
 #include <string>
+
+namespace blpl {
 
 /**
  * @class	Log
@@ -111,4 +112,4 @@ private:
                 << __LINE__
 #endif
 
-#endif // LOG_H
+}

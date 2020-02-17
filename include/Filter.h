@@ -7,6 +7,8 @@
 #include "PipeData.h"
 #include "Profiler.h"
 
+namespace blpl {
+
 class PIPELINE_EXPORT AbstractFilter
 {
     /**
@@ -58,3 +60,4 @@ private:
 template <class InData, class OutData>
 using FilterPtr = std::shared_ptr<Filter<InData, OutData>>;
 
+}
