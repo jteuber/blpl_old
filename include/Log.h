@@ -8,6 +8,23 @@
 namespace blpl {
 
 /**
+ * @enum	ErrorLevel
+ *
+ * @brief	Values that represent the importance of the logged message (aka
+ * the error level ;) ).
+ */
+enum class ErrorLevel
+{
+    Info = 0,   ///< Information
+    Warning,    ///< Problems or errors that were caught and do not have any
+                ///< impact on the execution of the program
+    Error,      ///< Errors which could not be dealt with and likely altered
+                ///< the programs behaviour
+    FatalError, ///< Errors that crash the program
+    NumErrorLevels
+};
+
+/**
  * @class	Log
  *
  * @brief	A simple logger class with support for multiple logs and stream
@@ -16,23 +33,6 @@ namespace blpl {
 class PIPELINE_EXPORT Log
 {
 public:
-    /**
-     * @enum	ErrorLevel
-     *
-     * @brief	Values that represent the importance of the logged message (aka
-     * the error level ;) ).
-     */
-    enum class ErrorLevel
-    {
-        Info = 0, ///< Information
-        Warning, ///< Problems or errors that were caught and do not have any
-                    ///< impact on the execution of the program
-        Error,   ///< Errors which could not be dealt with and likely altered
-                    ///< the programs behaviour
-        FatalError, ///< Errors that crash the program
-        NumErrorLevels
-    };
-
     explicit Log(const std::string& strLogName);
     ~Log();
 

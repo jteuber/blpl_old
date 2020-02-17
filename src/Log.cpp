@@ -5,7 +5,7 @@
 namespace blpl {
 
 namespace {
-const char* logLevelToPrefix[] = {
+const char* logLevelToPrefix[static_cast<int>(ErrorLevel::NumErrorLevels)] = {
     "INFO       : ", "WARNING    : ", "ERROR      : ", "FATAL ERROR: "};
 }
 
