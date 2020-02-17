@@ -7,6 +7,8 @@
 #include "AbstractPipe.h"
 #include "PipeData.h"
 
+namespace blpl {
+
 /**
  * Implements the pipes in the pipeline.
  * @tparam TData Type of the data to pass through the Pipe.
@@ -21,7 +23,7 @@ public:
     TData pop();
     TData blockingPop();
 
-    void push(TData &&data);
+    void push(TData&& data);
 
 private:
     TData m_elem;
@@ -81,3 +83,5 @@ public:
         return Generator();
     }
 };
+
+}

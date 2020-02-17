@@ -1,10 +1,11 @@
-#ifndef PROFILER_H
-#define PROFILER_H
+#pragma once
 
 #include <chrono>
 #include <string>
 
 #include "Log.h"
+
+namespace blpl {
 
 /**
  * @brief The Profiler class can be used for simple profiling of cyclic
@@ -28,4 +29,4 @@ private:
 #endif
 };
 
-#endif // PROFILER_H
+}

@@ -3,6 +3,8 @@
 
 #include <catch2/catch.hpp>
 
+using namespace blpl;
+
 class TestFilter0 : public Filter<Generator, int>
 {
 public:

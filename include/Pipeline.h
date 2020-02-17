@@ -8,6 +8,8 @@
 #include "FilterThread.h"
 #include "Pipe.h"
 
+namespace blpl {
+
 /**
  * Main pipeline class.
  * @tparam InData The datatype that goes into the pipeline.
@@ -96,4 +98,6 @@ operator|(std::shared_ptr<Filter<InData, IntermediateData>> first,
           std::shared_ptr<Filter<IntermediateData, OutData>> second)
 {
     return Pipeline<InData, OutData>(first, second);
+}
+
 }

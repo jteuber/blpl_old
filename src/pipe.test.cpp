@@ -5,6 +5,8 @@
 #include <chrono> // std::chrono::seconds
 #include <thread> // std::this_thread::sleep_for
 
+using namespace blpl;
+
 TEST_CASE("construction")
 {
     Pipe<int> pipe;
