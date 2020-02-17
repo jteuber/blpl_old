@@ -7,17 +7,16 @@ namespace blpl {
 namespace {
 const char* logLevelToPrefix[] = {
     "INFO       : ", "WARNING    : ", "ERROR      : ", "FATAL ERROR: "};
-const unsigned int maxLogLevel = 3;
 }
 
 /**
  * @brief	Constructor.
  *
- * @param	strLogName	Name of the log.
+ * @param	strLogName	Filename to use for the log.
  */
 Log::Log(const std::string& strLogName)
-    : m_elLowestLoggedLevel(EL_INFO)
-    , m_elLastStreamLogLvl(EL_INFO)
+    : m_elLowestLoggedLevel(ErrorLevel::Info)
+    , m_elLastStreamLogLvl(ErrorLevel::Info)
     , m_bSilent(false)
     , m_logFile(strLogName)
 {}
@@ -32,23 +31,21 @@ Log::~Log()
 }
 
 /**
- * @brief	Logs a message as info if no second parameter is given.
- *
- * @note	in debug mode every message will be written to the standard output
- * and directly to the logfile.
+ * @brief	Logs a message prefixed with the given error level and writes
+ * it to the log file immediately.
  *
  * @param	strMessage 	Message to log
- * @param	iErrorLevel	(optional) error level.
+ * @param	iErrorLevel	(optional) error level, Info if none is given.
  *
  * @return	true if the message was logged, false if not.
  */
-bool Log::logMessage(const std::string& strMessage, ErrorLevel elErrorLevel)
+bool Log::logMessage(const std::string& strMessage, ErrorLevel errorLevel)
 {
-    if (elErrorLevel < m_elLowestLoggedLevel || elErrorLevel > maxLogLevel)
+    if (errorLevel < m_elLowestLoggedLevel ||
+        errorLevel >= ErrorLevel::NumErrorLevels)
         return false;
 
-    std::string strPrefix = logLevelToPrefix[elErrorLevel];
-
+    std::string strPrefix = logLevelToPrefix[static_cast<int>(errorLevel)];
     m_strLogText += strPrefix + strMessage + "\n";
 
     if (!m_bSilent)
@@ -59,7 +56,7 @@ bool Log::logMessage(const std::string& strMessage, ErrorLevel elErrorLevel)
 }
 
 /**
- * @brief	Same as logMessage(strInfo) but possibly a little bit faster.
+ * @brief	Same as logMessage(strInfo).
  *
  * @param	strInfo	The info.
  *
@@ -67,20 +64,11 @@ bool Log::logMessage(const std::string& strMessage, ErrorLevel elErrorLevel)
  */
 bool Log::logInfo(const std::string& strInfo)
 {
-    if (m_elLowestLoggedLevel > EL_INFO)
-        return false;
-
-    m_strLogText += "INFO       : " + strInfo + "\n";
-
-    if (!m_bSilent)
-        std::cout << m_strLogText;
-    flush();
-
-    return true;
+    return logMessage(strInfo, ErrorLevel::Info);
 }
 
 /**
- * @brief	Same as logMessage(..., EL_WARNING), but faster and lazier.
+ * @brief	Same as logMessage(..., Warning).
  *
  * @param	strWarning	The warning.
  *
@@ -88,20 +76,11 @@ bool Log::logInfo(const std::string& strInfo)
  */
 bool Log::logWarning(const std::string& strWarning)
 {
-    if (m_elLowestLoggedLevel > EL_WARNING)
-        return false;
-
-    m_strLogText += "WARNING    : " + strWarning + "\n";
-
-    if (!m_bSilent)
-        std::cout << m_strLogText;
-    flush();
-
-    return true;
+    return logMessage(strWarning, ErrorLevel::Warning);
 }
 
 /**
- * @brief	Same as logMessage(..., EL_ERROR), but faster and lazier.
+ * @brief	Same as logMessage(..., Error).
  *
  * @param	strError	The error message.
  *
@@ -109,20 +88,11 @@ bool Log::logWarning(const std::string& strWarning)
  */
 bool Log::logError(const std::string& strError)
 {
-    if (m_elLowestLoggedLevel > EL_ERROR)
-        return false;
-
-    m_strLogText += "ERROR      : " + strError + "\n";
-
-    if (!m_bSilent)
-        std::cout << m_strLogText;
-    flush();
-
-    return true;
+    return logMessage(strError, ErrorLevel::Error);
 }
 
 /**
- * @brief	Same as logMessage(..., EL_FATAL_ERROR), but faster and lazier.
+ * @brief	Same as logMessage(..., FatalError).
  *
  * @param	strError	The error message.
  *
@@ -130,16 +100,7 @@ bool Log::logError(const std::string& strError)
  */
 bool Log::logFatalError(const std::string& strError)
 {
-    if (m_elLowestLoggedLevel > EL_FATAL_ERROR)
-        return false;
-
-    m_strLogText += "FATAL ERROR: " + strError + "\n";
-
-    if (!m_bSilent)
-        std::cout << m_strLogText;
-    flush();
-
-    return true;
+    return logMessage(strError, ErrorLevel::FatalError);
 }
 
 /**
@@ -147,9 +108,6 @@ bool Log::logFatalError(const std::string& strError)
  */
 void Log::flush()
 {
-    //	m_fsLogFile << m_strLogText;
-    //	m_fsLogFile << m_ssLogStream.str();
-    //	m_fsLogFile.flush();
     if (m_logFile.is_open()) {
         m_logFile.write(m_strLogText.c_str(), m_strLogText.length());
         m_logFile.flush();
@@ -162,7 +120,7 @@ void Log::flush()
  * @brief	Sets the lowest message level that will still be logged.
  *
  * @note	This call effects all subsequent calls of the logging methods.
- * 			If you do want to switch of logging pass 4 (EL_FATAL_ERROR+1).
+ * 			If you do want to switch of logging pass 4 (FatalError+1).
  *
  * @param	elLowestLoggedLevel	The lowest logged message level.
  */
@@ -204,8 +162,8 @@ bool Log::isSilent()
  */
 Log& Log::operator<<(const ErrorLevel eLvl)
 {
-    if (eLvl <= maxLogLevel) {
-        m_strLogText += logLevelToPrefix[eLvl];
+    if (eLvl < ErrorLevel::NumErrorLevels) {
+        m_strLogText += logLevelToPrefix[static_cast<int>(eLvl)];
     }
 
     m_elLastStreamLogLvl = eLvl;

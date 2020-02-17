@@ -22,21 +22,22 @@ public:
      * @brief	Values that represent the importance of the logged message (aka
      * the error level ;) ).
      */
-    enum ErrorLevel
+    enum class ErrorLevel
     {
-        EL_INFO = 0, ///< Information
-        EL_WARNING, ///< Problems or errors that were caught and do not have any
+        Info = 0, ///< Information
+        Warning, ///< Problems or errors that were caught and do not have any
                     ///< impact on the execution of the program
-        EL_ERROR,   ///< Errors which could not be dealt with and likely altered
+        Error,   ///< Errors which could not be dealt with and likely altered
                     ///< the programs behaviour
-        EL_FATAL_ERROR ///< Errors that crash the program
+        FatalError, ///< Errors that crash the program
+        NumErrorLevels
     };
 
     explicit Log(const std::string& strLogName);
     ~Log();
 
     bool logMessage(const std::string& strMessage,
-                    ErrorLevel elErrorLevel = EL_INFO);
+                    ErrorLevel errorLevel = ErrorLevel::Info);
 
     bool logInfo(const std::string& strMessage);
     bool logWarning(const std::string& strMessage);
