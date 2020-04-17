@@ -5,7 +5,7 @@
 #include <thread>
 
 #include "AbstractPipe.h"
-#include "PipeData.h"
+#include "Generator.h"
 
 namespace blpl {
 
@@ -37,9 +37,8 @@ Pipe<TData>::Pipe(bool waitForSlowestFilter)
 template <typename TData>
 TData Pipe<TData>::pop()
 {
-    TData temp = std::move(m_elem);
-    m_valid    = false;
-    return temp;
+    m_valid = false;
+    return std::move(m_elem);
 }
 
 template <typename TData>
@@ -80,8 +79,8 @@ public:
     }
     Generator blockingPop()
     {
-        return Generator();
+        return pop();
     }
 };
 
-}
+} // namespace blpl

@@ -85,6 +85,13 @@ int main()
 }
 ```
 
+## Poor Mans Profiler
+
+This library also contains a profiler and a very simple logger that supports logging into several files at ones. The
+profiler is usually compiled out. To use it you have to compile this library with `PROFILE` defined. Then the profiler
+will write one file for every filter in the pipeline with the processing time per run taken. The name of the file will
+be the symbol name of the class that defines the filter.
+
 ## License
 
 This library uses the MIT license:

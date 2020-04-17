@@ -1,4 +1,4 @@
-#include <FilterThread.h>
+#include "blpl/FilterThread.h"
 
 #include <catch2/catch.hpp>
 

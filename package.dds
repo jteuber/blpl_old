@@ -1,5 +1,0 @@
-Name: blpl
-Version: 0.1.0
-Namespace: org.jaytea.blpl
-
-Test-Driver: Catch-Main

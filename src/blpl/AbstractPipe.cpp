@@ -1,4 +1,4 @@
-#include "AbstractPipe.h"
+#include "blpl/AbstractPipe.h"
 
 namespace blpl {
 
@@ -28,4 +28,4 @@ unsigned int AbstractPipe::size()
     return m_valid ? 1 : 0;
 }
 
-}
+} // namespace blpl

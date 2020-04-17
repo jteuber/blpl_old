@@ -1,0 +1,6 @@
+{
+    name: 'blpl',
+    version: '0.1.0',
+    namespace: 'org.jaytea.blpl',
+    test_driver: 'Catch-Main',
+}

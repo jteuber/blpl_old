@@ -1,4 +1,4 @@
-#include "Profiler.h"
+#include "blpl/Profiler.h"
 
 namespace blpl {
 
@@ -35,4 +35,4 @@ void Profiler::endCycle()
 #endif
 }
 
-}
+} // namespace blpl

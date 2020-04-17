@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "blpl/Log.h"
 
 #include <iostream>
 
@@ -276,4 +276,4 @@ Log& Log::flush(Log& log)
     return log;
 }
 
-}
+} // namespace blpl
