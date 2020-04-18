@@ -17,6 +17,7 @@ set(SOURCES
 set(HEADERS
     include/blpl/Filter.h
     include/blpl/FilterThread.h
+    include/blpl/MultiFilter.h
     include/blpl/Log.h
     include/blpl/Generator.h
     include/blpl/Pipe.h

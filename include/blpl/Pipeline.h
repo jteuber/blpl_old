@@ -19,7 +19,7 @@ namespace blpl {
  * consider storing the pipeline as an AbstractPipeline instead.
  */
 template <class InData, class OutData>
-class Pipeline : public AbstractPipeline
+class PIPELINE_EXPORT Pipeline : public AbstractPipeline
 {
 public:
     template <class Filter1, class Filter2>
@@ -139,7 +139,7 @@ Pipeline<InData, OutData>::Pipeline(std::shared_ptr<Filter1> first,
  * @return A pipeline with the two filters stringed together.
  */
 template <class Filter1, class Filter2>
-Pipeline<typename Filter1::inType, typename Filter2::outType>
+PIPELINE_EXPORT Pipeline<typename Filter1::inType, typename Filter2::outType>
 operator|(std::shared_ptr<Filter1> first, std::shared_ptr<Filter2> second)
 {
     return Pipeline<typename Filter1::inType, typename Filter2::outType>(
