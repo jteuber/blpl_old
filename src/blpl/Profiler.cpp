@@ -1,10 +1,10 @@
-#include "Profiler.h"
+#include "blpl/Profiler.h"
 
 namespace blpl {
 
 Profiler::Profiler(const std::string& className)
 #ifdef PROFILE
-    : m_log(Log::getLog(className))
+    : m_log(className)
 {
     m_log.setSilentMode(true);
 }
@@ -35,4 +35,4 @@ void Profiler::endCycle()
 #endif
 }
 
-}
+} // namespace blpl

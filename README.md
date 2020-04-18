@@ -19,16 +19,18 @@ If you use dds just do `dds build -t :gcc` (or some other toolchain of your choi
 
 With cmake do the usual
 ```shell script
-mkdir build && cd build && cmake .. && make
+mkdir build && cd build && cmake .. && make && sudo make install
 ```
 in the library directory.
+
+The library has for now only been tested on linux. It might still have some hickups on windows and mac, but should in theory (tm) work fine.
  
 ## How to use
 
 ```c++
 // write a filter by inheriting Filter<InData,OutData>. *Generator* is a special type that tells the pipeline to
 // continuously call this filter.
-class StartFilter : public Filter<Generator, int>
+class StartFilter : public blpl::Filter<Generator, int>
 {
 public:
     // Implement your filter in processImpl
@@ -46,7 +48,7 @@ public:
 // and then a few more that do actual computation
 ...
 // and a last one that produces and maybe stores or shows the final output
-class EndFilter : public Filter<std::string, int>
+class EndFilter : public blpl::Filter<std::string, int>
 {
 public:
     // the payload in the pipes are moved to have as little overhead as possible. If you need shared resources just
@@ -61,10 +63,10 @@ public:
 int main() 
 {
     // instantiate the filters
-    auto startFilter = FilterPtr<Generator, int>(new StartFilter);
-    auto filter1 = FilterPtr<int, std::string>(new TestFilter1);
+    auto startFilter = std::make_shared<StartFilter>();
+    auto filter1 = std::make_shared<TestFilter1>();
     ...
-    auto endFilter = FilterPtr<std::string, int>(new EndFilter);
+    auto endFilter = std::make_shared<EndFilter>();
     
     // build the pipeline
     auto pipeline = startFilter |
@@ -84,6 +86,13 @@ int main()
     pipeline.stop();
 }
 ```
+
+## Poor Mans Profiler
+
+This library also contains a profiler and a very simple logger that supports logging into several files at ones. The
+profiler is usually compiled out. To use it you have to compile this library with `PROFILE` defined. Then the profiler
+will write one file for every filter in the pipeline with the processing time per run taken. The name of the file will
+be the symbol name of the class that defines the filter.
 
 ## License
 

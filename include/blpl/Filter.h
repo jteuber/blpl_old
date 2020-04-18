@@ -4,7 +4,6 @@
 
 #include <memory>
 
-#include "PipeData.h"
 #include "Profiler.h"
 
 namespace blpl {
@@ -16,7 +15,7 @@ class PIPELINE_EXPORT AbstractFilter
      * original state, so that the next call of Filter::process behaves like
      * this object was just created.
      */
-    virtual void reset() {};
+    virtual void reset(){};
 };
 
 /**
@@ -43,14 +42,17 @@ public:
         : m_prof(typeid(*this).name())
     {}
 
-    virtual OutData process(InData&& pIn)
+    virtual OutData process(InData&& in)
     {
         m_prof.startCycle();
-        auto out = processImpl(std::move(pIn));
+        auto out = processImpl(std::move(in));
         m_prof.endCycle();
 
         return out;
     }
+
+    typedef InData inType;
+    typedef OutData outType;
 
 private:
     Profiler m_prof;
@@ -60,4 +62,7 @@ private:
 template <class InData, class OutData>
 using FilterPtr = std::shared_ptr<Filter<InData, OutData>>;
 
-}
+#define FilterCast(InData, OutData, ConcreteFilter)                            \
+    std::static_pointer_cast<Filter<InData, OutData>>(ConcreteFilter)
+
+} // namespace blpl

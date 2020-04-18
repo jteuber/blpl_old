@@ -1,4 +1,4 @@
-#include "AbstractPipeline.h"
+#include "blpl/AbstractPipeline.h"
 
 namespace blpl {
 
@@ -21,4 +21,4 @@ void AbstractPipeline::stop()
     }
 }
 
-}
+} // namespace blpl
