@@ -47,3 +47,36 @@ install(
 
 install(EXPORT blpl DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/blpl)
 #export(TARGETS ${PROJECT_NAME} FILE blplConfig.cmake)
+
+
+
+# TESTS
+
+find_package(Catch2 REQUIRED)
+include(CTest)
+include(Catch)
+
+
+add_executable(testFilterThread src/blpl/filterthread.test.cpp)
+target_link_libraries(testFilterThread Catch2::Catch2 blpl pthread)
+target_include_directories(testFilterThread PRIVATE include)
+target_compile_definitions(testFilterThread PRIVATE CATCH_CONFIG_MAIN)
+catch_discover_tests(testFilterThread)
+
+add_executable(testMultiFilter src/blpl/multifilter.test.cpp)
+target_link_libraries(testMultiFilter Catch2::Catch2 blpl pthread)
+target_include_directories(testMultiFilter PRIVATE include)
+target_compile_definitions(testMultiFilter PRIVATE CATCH_CONFIG_MAIN)
+catch_discover_tests(testMultiFilter)
+
+add_executable(testPipeline src/blpl/pipeline.test.cpp)
+target_link_libraries(testPipeline Catch2::Catch2 blpl pthread)
+target_include_directories(testPipeline PRIVATE include)
+target_compile_definitions(testPipeline PRIVATE CATCH_CONFIG_MAIN)
+catch_discover_tests(testPipeline)
+
+add_executable(testPipe src/blpl/pipe.test.cpp)
+target_link_libraries(testPipe Catch2::Catch2 blpl pthread)
+target_include_directories(testPipe PRIVATE include)
+target_compile_definitions(testPipe PRIVATE CATCH_CONFIG_MAIN)
+catch_discover_tests(testPipe)
