@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-project(blpl VERSION 0.1.0 DESCRIPTION "big, lightweight pipeline" LANGUAGES CXX)
+project(blpl VERSION 0.1.1 DESCRIPTION "big, lightweight pipeline" LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
