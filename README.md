@@ -19,9 +19,11 @@ If you use dds just do `dds build -t :gcc` (or some other toolchain of your choi
 
 With cmake do the usual
 ```shell script
-mkdir build && cd build && cmake .. && make
+mkdir build && cd build && cmake .. && make && sudo make install
 ```
 in the library directory.
+
+The library has for now only been tested on linux. It might still have some hickups on windows and mac, but should in theory (tm) work fine.
  
 ## How to use
 
@@ -61,10 +63,10 @@ public:
 int main() 
 {
     // instantiate the filters
-    auto startFilter = blpl::FilterPtr<Generator, int>(new StartFilter);
-    auto filter1 = blpl::FilterPtr<int, std::string>(new TestFilter1);
+    auto startFilter = std::make_shared<StartFilter>();
+    auto filter1 = std::make_shared<TestFilter1>();
     ...
-    auto endFilter = blpl::FilterPtr<std::string, int>(new EndFilter);
+    auto endFilter = std::make_shared<EndFilter>();
     
     // build the pipeline
     auto pipeline = startFilter |
