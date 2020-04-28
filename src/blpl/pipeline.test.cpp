@@ -1,4 +1,5 @@
 #include "blpl/Filter.h"
+#include "blpl/MultiFilter.h"
 #include "blpl/Pipeline.h"
 
 #include <catch2/catch.hpp>
@@ -53,6 +54,18 @@ public:
     std::string m_lastInput;
 };
 
+class TestFilterMultiIn : public Filter<std::vector<int>, float>
+{
+public:
+    float processImpl(std::vector<int>&& in) override
+    {
+        float ret = 0.f;
+        for (int& i : in)
+            ret += static_cast<float>(i);
+        return ret / 2.f;
+    }
+};
+
 TEST_CASE("simple pipeline construction")
 {
     auto filter1  = FilterPtr<int, float>(new TestFilter1);
@@ -91,4 +104,54 @@ TEST_CASE("pipeline test")
 
     REQUIRE(filter0->m_i == 100);
     REQUIRE(std::stoi(filter3->m_lastInput) == 50);
+}
+
+TEST_CASE("pipeline with multifilter start")
+{
+    auto filter0_0 = std::make_shared<TestFilter0>();
+    auto filter0_1 = std::make_shared<TestFilter0>();
+    auto filter1   = std::make_shared<TestFilterMultiIn>();
+    auto filter2   = std::make_shared<TestFilter2>();
+    auto filter3   = std::make_shared<TestFilter3>();
+    auto pipeline  = filter0_0 & filter0_1 | filter1 | filter2 | filter3;
+
+    REQUIRE(pipeline.length() == 4);
+
+    pipeline.start();
+    int output = 0;
+    while (output++ < 100) {
+        pipeline.outPipe()->blockingPop();
+    }
+    pipeline.stop();
+
+    REQUIRE(filter0_0->m_i == 100);
+    REQUIRE(std::stoi(filter3->m_lastInput) == 100);
+}
+
+TEST_CASE("pipeline with multifilter start to end")
+{
+    auto filter0_0 = std::make_shared<TestFilter0>();
+    auto filter0_1 = std::make_shared<TestFilter0>();
+    auto filter1_0 = std::make_shared<TestFilter1>();
+    auto filter1_1 = std::make_shared<TestFilter1>();
+    auto filter2_0 = std::make_shared<TestFilter2>();
+    auto filter2_1 = std::make_shared<TestFilter2>();
+    auto filter3_0 = std::make_shared<TestFilter3>();
+    auto filter3_1 = std::make_shared<TestFilter3>();
+    auto pipeline  = filter0_0 & filter0_1 | filter1_0 & filter1_1 |
+                    filter2_0 & filter2_1 | filter3_0 & filter3_1;
+
+    REQUIRE(pipeline.length() == 4);
+
+    pipeline.start();
+    int output = 0;
+    while (output++ < 100) {
+        pipeline.outPipe()->blockingPop();
+    }
+    pipeline.stop();
+
+    REQUIRE(filter0_0->m_i == 100);
+    REQUIRE(std::stoi(filter3_0->m_lastInput) == 50);
+    REQUIRE(filter0_1->m_i == 100);
+    REQUIRE(std::stoi(filter3_1->m_lastInput) == 50);
 }

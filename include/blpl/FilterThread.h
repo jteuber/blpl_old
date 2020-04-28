@@ -35,6 +35,11 @@ public:
                           std::shared_ptr<Filter<InData, OutData>> filter,
                           std::shared_ptr<Pipe<OutData>> outPipe,
                           bool bSelfManaged = true);
+    explicit FilterThread(std::shared_ptr<Pipe<InData>> inPipe,
+                          Filter<InData, OutData>&& filter,
+                          std::shared_ptr<Pipe<OutData>> outPipe,
+                          bool bSelfManaged = true);
+
     ~FilterThread();
 
     virtual bool isFiltering();
@@ -60,7 +65,8 @@ private:
  * @brief Constructor.
  *
  * @param pOutput       Pipe on which the filter will dump its outgoing data.
- * @param pFilter       The filter that is called for processing in this thread.
+ * @param pFilter       The filter that is called for processing in this thread
+ * in a shared pointer.
  * @param pInput        Pipe which stores the input for the filter.
  * @param bSelfManaged  True if the FilterThread is allowed to manage the filter
  * by itself, false if another class manages the FilterThread (i.e. calls
@@ -74,6 +80,31 @@ FilterThread<InData, OutData>::FilterThread(
     bool bSelfManaged)
     : m_inPipe(inPipe)
     , m_filter(filter)
+    , m_outPipe(outPipe)
+    , m_bFilterThreadActive(false)
+    , m_bFiltering(false)
+    , m_bSelfManaged(bSelfManaged)
+{}
+
+/**
+ * @brief Constructor.
+ *
+ * @param pOutput       Pipe on which the filter will dump its outgoing data.
+ * @param pFilter       The filter that is called for processing in this thread
+ * moved into this.
+ * @param pInput        Pipe which stores the input for the filter.
+ * @param bSelfManaged  True if the FilterThread is allowed to manage the filter
+ * by itself, false if another class manages the FilterThread (i.e. calls
+ * FilterThread::run()).
+ */
+template <class InData, class OutData>
+FilterThread<InData, OutData>::FilterThread(
+    std::shared_ptr<Pipe<InData>> inPipe,
+    Filter<InData, OutData>&& filter,
+    std::shared_ptr<Pipe<OutData>> outPipe,
+    bool bSelfManaged)
+    : m_inPipe(inPipe)
+    , m_filter(std::make_shared(filter))
     , m_outPipe(outPipe)
     , m_bFilterThreadActive(false)
     , m_bFiltering(false)
@@ -145,4 +176,4 @@ void FilterThread<InData, OutData>::run()
     m_bFiltering = false;
 }
 
-}
+} // namespace blpl

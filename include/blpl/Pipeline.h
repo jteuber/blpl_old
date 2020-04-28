@@ -33,6 +33,10 @@ public:
     Pipeline<InData, typename ExtendingFilter::outType>
     operator|(std::shared_ptr<ExtendingFilter> filter);
 
+    template <class ExtendingFilter>
+    Pipeline<InData, typename ExtendingFilter::outType>
+    operator|(ExtendingFilter&& filter);
+
     std::shared_ptr<Pipe<OutData>> outPipe()
     {
         return m_outPipe;
@@ -54,10 +58,11 @@ private:
  *
  * @tparam InData The input datatype of the original pipeline, on the left.
  * @tparam OutData The output datatype of the original pipeline, on the left.
- * @tparam ExtendedData The datatype of the output of the filter with which the
- * pipeline gets extended.
+ * @tparam ExtendingFilter The type of the filter with which the pipeline gets
+ * extended.
  *
- * @param filter The filter that will be added to the end of the pipeline
+ * @param filter The filter that will be added to the end of the pipeline as
+ * shared pointer
  * @return A new pipeline constructed out of this pipeline with the given filter
  * appended. The original pipeline will be invalidated.
  */
@@ -68,6 +73,28 @@ Pipeline<InData, OutData>::operator|(std::shared_ptr<ExtendingFilter> filter)
 {
     return Pipeline<InData, typename ExtendingFilter::outType>(std::move(*this),
                                                                filter);
+}
+
+/**
+ * @brief Pipe operator to string together filters to form a pipeline.
+ *
+ * @tparam InData The input datatype of the original pipeline, on the left.
+ * @tparam OutData The output datatype of the original pipeline, on the left.
+ * @tparam ExtendingFilter The type of the filter with which the pipeline gets
+ * extended.
+ *
+ * @param filter The filter that will be added to the end of the pipeline
+ * @return A new pipeline constructed out of this pipeline with the given filter
+ * appended. The original pipeline will be invalidated.
+ */
+template <class InData, class OutData>
+template <class ExtendingFilter>
+Pipeline<InData, typename ExtendingFilter::outType>
+Pipeline<InData, OutData>::operator|(ExtendingFilter&& filter)
+{
+    std::shared_ptr<ExtendingFilter> ptr(new ExtendingFilter(filter));
+    return Pipeline<InData, typename ExtendingFilter::outType>(std::move(*this),
+                                                               ptr);
 }
 
 /**
@@ -133,8 +160,9 @@ Pipeline<InData, OutData>::Pipeline(std::shared_ptr<Filter1> first,
 /**
  * @brief Pipe operator stringing together two filters to form a pipeline.
  *
- * @param first The first filter of the new pipeline
- * @param second The second and last filter of the new pipeline
+ * @param first The first filter of the new pipeline in a shared pointer
+ * @param second The second and last filter of the new pipeline in a shared
+ * pointer
  *
  * @return A pipeline with the two filters stringed together.
  */
@@ -144,6 +172,61 @@ operator|(std::shared_ptr<Filter1> first, std::shared_ptr<Filter2> second)
 {
     return Pipeline<typename Filter1::inType, typename Filter2::outType>(
         first, second);
+}
+
+/**
+ * @brief Pipe operator stringing together two filters to form a pipeline.
+ *
+ * @param first The first filter of the new pipeline moved into the pipeline
+ * @param second The second and last filter of the new pipeline moved into the
+ * pipeline
+ *
+ * @return A pipeline with the two filters stringed together.
+ */
+template <class Filter1, class Filter2>
+PIPELINE_EXPORT Pipeline<typename Filter1::inType, typename Filter2::outType>
+operator|(Filter1&& first, Filter2&& second)
+{
+    std::shared_ptr<Filter1> ptr1(new Filter1(first));
+    std::shared_ptr<Filter2> ptr2(new Filter2(second));
+    return Pipeline<typename Filter1::inType, typename Filter2::outType>(ptr1,
+                                                                         ptr2);
+}
+
+/**
+ * @brief Pipe operator stringing together two filters to form a pipeline.
+ *
+ * @param first The first filter of the new pipeline in a shared pointer
+ * @param second The second and last filter of the new pipeline moved into the
+ * pipeline
+ *
+ * @return A pipeline with the two filters stringed together.
+ */
+template <class Filter1, class Filter2>
+PIPELINE_EXPORT Pipeline<typename Filter1::inType, typename Filter2::outType>
+operator|(std::shared_ptr<Filter1> first, Filter2&& second)
+{
+    std::shared_ptr<Filter2> ptr(new Filter2(second));
+    return Pipeline<typename Filter1::inType, typename Filter2::outType>(first,
+                                                                         ptr);
+}
+
+/**
+ * @brief Pipe operator stringing together two filters to form a pipeline.
+ *
+ * @param first The first filter of the new pipeline moved into the pipeline
+ * @param second The second and last filter of the new pipeline in a shared
+ * pointer
+ *
+ * @return A pipeline with the two filters stringed together.
+ */
+template <class Filter1, class Filter2>
+PIPELINE_EXPORT Pipeline<typename Filter1::inType, typename Filter2::outType>
+operator|(Filter1&& first, std::shared_ptr<Filter2> second)
+{
+    std::shared_ptr<Filter1> ptr(new Filter1(first));
+    return Pipeline<typename Filter1::inType, typename Filter2::outType>(
+        ptr, second);
 }
 
 } // namespace blpl
