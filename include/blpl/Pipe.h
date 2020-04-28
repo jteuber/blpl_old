@@ -63,7 +63,7 @@ void Pipe<TData>::push(TData&& data)
     m_valid = true;
 }
 
-/// GENERATOR PIPE
+/// GENERATOR PIPES
 template <>
 class PIPELINE_EXPORT Pipe<Generator> : public AbstractPipe
 {
@@ -78,6 +78,24 @@ public:
         return Generator();
     }
     Generator blockingPop()
+    {
+        return pop();
+    }
+};
+template <>
+class PIPELINE_EXPORT Pipe<std::vector<Generator>> : public AbstractPipe
+{
+public:
+    explicit Pipe(bool waitForSlowestFilter = false)
+        : AbstractPipe(waitForSlowestFilter)
+    {}
+    virtual ~Pipe() = default;
+
+    std::vector<Generator> pop()
+    {
+        return std::vector<Generator>();
+    }
+    std::vector<Generator> blockingPop()
     {
         return pop();
     }

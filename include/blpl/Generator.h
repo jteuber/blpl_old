@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <thread>
+#include <vector>
 
 namespace blpl {
 
@@ -22,3 +23,28 @@ public:
 };
 
 } // namespace blpl
+
+namespace std {
+
+template <>
+class PIPELINE_EXPORT vector<blpl::Generator>
+{
+public:
+    blpl::Generator& operator[](size_t);
+    const blpl::Generator& operator[](size_t) const;
+
+private:
+    blpl::Generator m_theGenerator;
+};
+
+blpl::Generator& vector<blpl::Generator>::operator[](size_t)
+{
+    return m_theGenerator;
+}
+
+const blpl::Generator& vector<blpl::Generator>::operator[](size_t) const
+{
+    return m_theGenerator;
+}
+
+} // namespace std
