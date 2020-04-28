@@ -43,6 +43,18 @@ TEST_CASE("bigger multifilter construction")
     REQUIRE(multifilter.size() == 3);
 }
 
+TEST_CASE("multifilter construction from vector")
+{
+    std::vector<std::shared_ptr<TestFilter2>> vector;
+    vector.push_back(std::make_shared<TestFilter2>());
+    vector.push_back(std::make_shared<TestFilter2>());
+    vector.push_back(std::make_shared<TestFilter2>());
+
+    auto multifilter = MultiFilter<int, float>(vector);
+
+    REQUIRE(multifilter.size() == 3);
+}
+
 TEST_CASE("simple multifilter process")
 {
     auto filter1     = std::make_shared<TestFilter1>();
